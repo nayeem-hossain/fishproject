@@ -57,11 +57,7 @@ export function Sidebar({ role, username }: { role: Role; username: string }) {
         })}
       </nav>
 
-      <div className="mt-auto space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-        <div>
-          <p className="font-semibold text-white">Project shell</p>
-          <p className="mt-1 text-slate-400">Parent projects, pond sub-projects, inventory, feed, and document tracking will all live under this console.</p>
-        </div>
+      <div className="mt-auto">
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
           className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-100 transition hover:bg-white/10"

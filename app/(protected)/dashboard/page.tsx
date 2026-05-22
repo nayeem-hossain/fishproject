@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { getDashboardMetrics } from "@/lib/dashboard";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,8 @@ function MetricCard({ title, value, helper }: { title: string; value: string; he
 
 export default async function DashboardPage() {
   const session = await auth();
-  const metrics = await getDashboardMetrics();
-  const isAdmin = session?.user.role === "ADMIN";
+  const metrics = await getDashboardMetrics(session?.user.projectId);
+  const isAdmin = session?.user.role === "ADMIN" && !session?.user.projectId;
 
   const cards = isAdmin
     ? [
@@ -54,11 +55,10 @@ export default async function DashboardPage() {
       </section>
 
       <section className="surface p-6">
-        <h2 className="text-lg font-semibold text-white">Next checkpoints</h2>
+        <h2 className="text-lg font-semibold text-white">Quick links</h2>
         <ul className="mt-4 space-y-3 text-sm text-slate-300">
-          <li>Wire the documents module to Vercel Blob uploads and URL storage.</li>
-          <li>Implement inventory and feed server actions with Decimal-backed calculations.</li>
-          <li>Finish admin-only user management and expand route-level guards.</li>
+          <li>→ <Link href="/projects" className="text-sky-300 hover:underline">Browse projects</Link> to manage documents, inventory, and feed logs.</li>
+          {isAdmin && <li>→ <Link href="/users" className="text-sky-300 hover:underline">Manage users</Link> to create or assign project-scoped accounts.</li>}
         </ul>
       </section>
     </div>
