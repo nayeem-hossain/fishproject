@@ -29,33 +29,35 @@ type FileFieldName = typeof FILE_FIELDS[number]["name"];
 function FileInputField({ name, label }: { name: FileFieldName; label: string }) {
   const [fileName, setFileName] = useState<string | null>(null);
   const ref = useRef<HTMLInputElement>(null);
+  const inputId = `file-input-${name}`;
   return (
     <div>
-      <label className="label-text">
+      <label htmlFor={inputId} className="label-text block mb-1">
         {label} <span className="text-slate-500 font-normal">(optional)</span>
       </label>
       <div className="flex items-center gap-2">
-        <label className="cursor-pointer flex-1">
+        <label htmlFor={inputId} className="cursor-pointer flex-1 min-w-0">
           <span className="input-field py-2 block text-sm text-slate-400 truncate">
             {fileName ?? "Choose file…"}
           </span>
-          <input
-            ref={ref}
-            name={name}
-            type="file"
-            accept=".pdf,.jpg,.jpeg,.png,.webp"
-            className="sr-only"
-            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
-          />
         </label>
+        <input
+          ref={ref}
+          id={inputId}
+          name={name}
+          type="file"
+          accept=".pdf,.jpg,.jpeg,.png,.webp"
+          className="sr-only"
+          onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+        />
         {fileName && (
           <button
             type="button"
             onClick={() => {
-              if (ref.current) { ref.current.value = ""; }
+              if (ref.current) ref.current.value = "";
               setFileName(null);
             }}
-            className="shrink-0 text-xs text-rose-300 hover:text-rose-200 hover:underline"
+            className="shrink-0 whitespace-nowrap text-xs text-rose-300 hover:text-rose-200 hover:underline"
           >
             Remove
           </button>
@@ -123,9 +125,11 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
           <h2 className="text-lg font-semibold text-white">Documents ({documents.length})</h2>
           <p className="mt-1 text-sm text-slate-400">Upload and retrieve project records on demand.</p>
         </div>
-        <button onClick={() => { setError(""); setShowCreate(true); }} className="button-primary">
-          + Add Document
-        </button>
+        {(role === "ADMIN" || role === "OPERATOR") && (
+          <button onClick={() => { setError(""); setShowCreate(true); }} className="button-primary">
+            + Add Document
+          </button>
+        )}
       </div>
 
       <section className="surface overflow-hidden">
@@ -179,6 +183,7 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
 
       <Modal title="New Document" open={showCreate} onClose={() => setShowCreate(false)} size="xl">
         <form onSubmit={handleCreate} className="space-y-4">
+          <input type="hidden" name="projectId" value={projectId} />
           {error && <p className="rounded-2xl border border-rose-400/20 bg-rose-500/10 p-3 text-sm text-rose-200">{error}</p>}
           <div className="grid gap-4 md:grid-cols-2">
             <div>

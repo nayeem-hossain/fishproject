@@ -14,7 +14,7 @@ const permissions: Record<Role, Record<Resource, Action[]>> = {
   OPERATOR: {
     dashboard: ["view"],
     projects: ["view", "update"],
-    documents: ["view", "update"],
+    documents: ["view", "create", "update"],
     inventory: ["view", "create", "update"],
     feed: ["view", "create", "update"],
     users: []
