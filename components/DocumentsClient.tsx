@@ -165,8 +165,10 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
               { name: "tradeLicenseFile", label: "Trade License" }
             ].map((fileField) => (
               <div key={fileField.name}>
-                <label className="label-text" htmlFor={`create-${fileField.name}`}>{fileField.label}</label>
-                <input id={`create-${fileField.name}`} name={fileField.name} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="input-field py-2" required />
+                <label className="label-text" htmlFor={`create-${fileField.name}`}>
+                  {fileField.label} <span className="text-slate-500 font-normal">(optional)</span>
+                </label>
+                <input id={`create-${fileField.name}`} name={fileField.name} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="input-field py-2" />
               </div>
             ))}
           </div>

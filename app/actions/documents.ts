@@ -8,14 +8,22 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { uploadProjectDocumentFile } from "@/lib/blob";
 
-function requireFile(formData: FormData, fieldName: string) {
+function getOptionalFile(formData: FormData, fieldName: string): File | null {
   const file = formData.get(fieldName);
-
-  if (!(file instanceof File) || file.size <= 0) {
-    throw new Error(`${fieldName} is required.`);
-  }
-
+  if (!(file instanceof File) || file.size <= 0) return null;
   return file;
+}
+
+async function maybeUpload(
+  file: File | null,
+  params: { projectId: string; subProject: string; label: string }
+): Promise<string> {
+  if (!file) return "";
+  try {
+    return await uploadProjectDocumentFile({ ...params, file });
+  } catch (e) {
+    throw new Error(`File upload failed for ${params.label}: ${e instanceof Error ? e.message : String(e)}`);
+  }
 }
 
 export async function createDocumentAction(formData: FormData) {
@@ -35,28 +43,12 @@ export async function createDocumentAction(formData: FormData) {
   }
 
   const values = documentSchema.parse(parseFormEntries(formData));
-  const [deedFile, guarantorChequeFile, nidFile, tradeLicenseFile] = [
-    requireFile(formData, "deedFile"),
-    requireFile(formData, "guarantorChequeFile"),
-    requireFile(formData, "nidFile"),
-    requireFile(formData, "tradeLicenseFile")
-  ];
 
   const [deedFileUrl, guarantorChequeFileUrl, nidFileUrl, tradeLicenseFileUrl] = await Promise.all([
-    uploadProjectDocumentFile({ projectId, subProject: values.subProject, label: "deed", file: deedFile }),
-    uploadProjectDocumentFile({
-      projectId,
-      subProject: values.subProject,
-      label: "guarantor-cheque",
-      file: guarantorChequeFile
-    }),
-    uploadProjectDocumentFile({ projectId, subProject: values.subProject, label: "nid", file: nidFile }),
-    uploadProjectDocumentFile({
-      projectId,
-      subProject: values.subProject,
-      label: "trade-license",
-      file: tradeLicenseFile
-    })
+    maybeUpload(getOptionalFile(formData, "deedFile"),            { projectId, subProject: values.subProject, label: "deed" }),
+    maybeUpload(getOptionalFile(formData, "guarantorChequeFile"), { projectId, subProject: values.subProject, label: "guarantor-cheque" }),
+    maybeUpload(getOptionalFile(formData, "nidFile"),             { projectId, subProject: values.subProject, label: "nid" }),
+    maybeUpload(getOptionalFile(formData, "tradeLicenseFile"),    { projectId, subProject: values.subProject, label: "trade-license" }),
   ]);
 
   await prisma.document.create({
