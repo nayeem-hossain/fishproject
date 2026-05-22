@@ -27,11 +27,15 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            username: parsed.data.username
-          }
-        });
+        let user;
+        try {
+          user = await prisma.user.findUnique({
+            where: { username: parsed.data.username }
+          });
+        } catch (e) {
+          console.error("[auth] DB error during login:", e);
+          throw new Error("Database unavailable. Please try again.");
+        }
 
         if (!user) {
           return null;
