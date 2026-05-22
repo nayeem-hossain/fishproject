@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Modal } from "@/components/Modal";
 import { createDocumentAction, deleteDocumentAction, updateDocumentAction } from "@/app/actions/documents";
@@ -17,6 +17,54 @@ interface DocumentRow {
   tradeLicenseFileUrl?: string | null;
 }
 
+const FILE_FIELDS = [
+  { name: "deedFile",            label: "Deed File" },
+  { name: "guarantorChequeFile", label: "Guarantor Cheque" },
+  { name: "nidFile",             label: "NID File" },
+  { name: "tradeLicenseFile",    label: "Trade License" },
+] as const;
+
+type FileFieldName = typeof FILE_FIELDS[number]["name"];
+
+function FileInputField({ name, label }: { name: FileFieldName; label: string }) {
+  const [fileName, setFileName] = useState<string | null>(null);
+  const ref = useRef<HTMLInputElement>(null);
+  return (
+    <div>
+      <label className="label-text">
+        {label} <span className="text-slate-500 font-normal">(optional)</span>
+      </label>
+      <div className="flex items-center gap-2">
+        <label className="cursor-pointer flex-1">
+          <span className="input-field py-2 block text-sm text-slate-400 truncate">
+            {fileName ?? "Choose file…"}
+          </span>
+          <input
+            ref={ref}
+            name={name}
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            className="sr-only"
+            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
+          />
+        </label>
+        {fileName && (
+          <button
+            type="button"
+            onClick={() => {
+              if (ref.current) { ref.current.value = ""; }
+              setFileName(null);
+            }}
+            className="shrink-0 text-xs text-rose-300 hover:text-rose-200 hover:underline"
+          >
+            Remove
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function DocumentsClient({ projectId, documents, role }: { projectId: string; documents: DocumentRow[]; role: string }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -29,13 +77,10 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
     setError("");
     const fd = new FormData(e.currentTarget);
     startTransition(async () => {
-      try {
-        await createDocumentAction(fd);
-        setShowCreate(false);
-        router.refresh();
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Error creating document");
-      }
+      const result = await createDocumentAction(fd);
+      if ("error" in result) { setError(result.error); return; }
+      setShowCreate(false);
+      router.refresh();
     });
   }
 
@@ -45,25 +90,19 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
     setError("");
     const fd = new FormData(e.currentTarget);
     startTransition(async () => {
-      try {
-        await updateDocumentAction(editDoc.id, projectId, fd);
-        setEditDoc(null);
-        router.refresh();
-      } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Error updating document");
-      }
+      const result = await updateDocumentAction(editDoc.id, projectId, fd);
+      if ("error" in result) { setError(result.error); return; }
+      setEditDoc(null);
+      router.refresh();
     });
   }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this document record?")) return;
     startTransition(async () => {
-      try {
-        await deleteDocumentAction(id, projectId);
-        router.refresh();
-      } catch (err: unknown) {
-        alert(err instanceof Error ? err.message : "Error deleting document");
-      }
+      const result = await deleteDocumentAction(id, projectId);
+      if ("error" in result) { alert(result.error); return; }
+      router.refresh();
     });
   }
 
@@ -158,18 +197,8 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
               <label className="label-text" htmlFor="create-guarantorName">Guarantor Name</label>
               <input id="create-guarantorName" name="guarantorName" required className="input-field" />
             </div>
-            {[
-              { name: "deedFile", label: "Deed File" },
-              { name: "guarantorChequeFile", label: "Guarantor Cheque" },
-              { name: "nidFile", label: "NID File" },
-              { name: "tradeLicenseFile", label: "Trade License" }
-            ].map((fileField) => (
-              <div key={fileField.name}>
-                <label className="label-text" htmlFor={`create-${fileField.name}`}>
-                  {fileField.label} <span className="text-slate-500 font-normal">(optional)</span>
-                </label>
-                <input id={`create-${fileField.name}`} name={fileField.name} type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="input-field py-2" />
-              </div>
+            {FILE_FIELDS.map((f) => (
+              <FileInputField key={f.name} name={f.name} label={f.label} />
             ))}
           </div>
           <div className="flex justify-end gap-3 pt-2">
