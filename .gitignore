@@ -1,57 +1,74 @@
-# Local secrets, credentials, and machine-specific data
-
-# Node / Next.js build output
+# ── Node / Next.js ───────────────────────────────────────────
 node_modules/
 .next/
 .turbo/
-coverage/
 out/
-.vercel/
+coverage/
 *.tsbuildinfo
 
-# AI tooling / local dev config
+# ── Vercel ────────────────────────────────────────────────────
+.vercel/
+
+# ── Environment & secrets ─────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── AI / local tooling ────────────────────────────────────────
 .claude/
 .copilot-kit/
 AudioInstructions/
+Demo-01/
+copilot-starter-kit/
+.env.copilot.example
+PROJECT-ADR.md
 
-# Environment files
-.env
-.env.*
-!.env.copilot.example
-!.env.example
+# ── Logs & debug output ───────────────────────────────────────
+*.log
+*.trace
+*.dmp
+*.dump
 
-# Secret-bearing file types
-*.secret
-*.secrets
-*.secret.*
-*.secrets.*
-*.token
-*.tokens
-*.token.*
-*.tokens.*
-*.credential
-*.credentials
-*.credential.*
-*.credentials.*
-*.key
-*.keys
+# ── Database files ────────────────────────────────────────────
+*.sqlite
+*.sqlite3
+
+# ── OS / editor artifacts ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+
+# ── Secret / credential file types ───────────────────────────
 *.pem
 *.p12
 *.pfx
 *.p8
+*.key
+*.keys
 *.crt
 *.cer
-*.der
-*.p7b
-*.p7c
 *.jks
 *.keystore
 id_rsa
 id_dsa
 id_ecdsa
 id_ed25519
+*.secret
+*.secrets
+*.token
+*.tokens
+*.credential
+*.credentials
+service-account*.json
+client_secret*.json
 
-# Cloud / tooling credentials
+# ── Terraform & infra state ───────────────────────────────────
+*.tfstate
+*.tfstate.*
+
+# ── Cloud / tool credentials ─────────────────────────────────
 .npmrc
 .netrc
 .pypirc
@@ -60,15 +77,3 @@ id_ed25519
 .aws/config
 .kube/config
 .gcloud/
-
-# Common secret fixtures and exports
-service-account*.json
-client_secret*.json
-*.tfstate
-*.tfstate.*
-*.log
-*.trace
-*.dmp
-*.dump
-*.sqlite
-*.sqlite3
