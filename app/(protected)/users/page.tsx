@@ -17,7 +17,10 @@ export default async function UsersPage() {
     redirect("/dashboard");
   }
 
-  const users = await prisma.user.findMany().catch(() => []);
+  const [users, projects] = await Promise.all([
+    prisma.user.findMany({ include: { project: { select: { id: true, projectName: true } } } }).catch(() => []),
+    prisma.project.findMany({ orderBy: { projectName: "asc" } }).catch(() => []),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -25,11 +28,11 @@ export default async function UsersPage() {
         <p className="text-xs uppercase tracking-[0.35em] text-sky-300/80">User management</p>
         <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white">Administrator accounts</h1>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-300">
-          Create and manage operator and administrator accounts for the protected workspace.
+          Create and manage operator and administrator accounts. Assign a project to restrict a user to that project only.
         </p>
       </section>
 
-      <UsersClient users={users} />
+      <UsersClient users={users} projects={projects} />
     </div>
   );
 }

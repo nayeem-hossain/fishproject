@@ -1,0 +1,5 @@
+{
+  "task.allowAutomaticTasks": "on",
+  "chat.promptFiles": true,
+  "chat.promptFilesRecommendations": true
+}

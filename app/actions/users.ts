@@ -36,7 +36,8 @@ export async function createUserAction(formData: FormData) {
     data: {
       username: values.username,
       passwordHash,
-      role: values.role
+      role: values.role,
+      projectId: values.projectId ?? null,
     }
   });
 
@@ -55,9 +56,10 @@ export async function updateUserAction(id: string, formData: FormData) {
   }
 
   const values = userUpdateSchema.parse(parseFormEntries(formData));
-  const updateData: { username: string; role: "ADMIN" | "OPERATOR"; passwordHash?: string } = {
+  const updateData: { username: string; role: "ADMIN" | "OPERATOR"; projectId: string | null; passwordHash?: string } = {
     username: values.username,
-    role: values.role
+    role: values.role,
+    projectId: values.projectId ?? null,
   };
 
   if (values.newPassword && values.newPassword.length > 0) {
@@ -66,7 +68,7 @@ export async function updateUserAction(id: string, formData: FormData) {
 
   await prisma.user.update({
     where: { id },
-    data: updateData
+    data: updateData,
   });
 
   revalidatePath("/users");

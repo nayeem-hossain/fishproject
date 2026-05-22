@@ -20,11 +20,12 @@ export default async function ProjectLayout({
 
   const { id } = await params;
 
-  const project = await prisma.project.findUnique({
-    where: {
-      id
-    }
-  });
+  // If the user is scoped to a specific project, block access to any other project
+  if (session.user.projectId && session.user.projectId !== id) {
+    redirect("/projects");
+  }
+
+  const project = await prisma.project.findUnique({ where: { id } });
 
   if (!project) {
     notFound();

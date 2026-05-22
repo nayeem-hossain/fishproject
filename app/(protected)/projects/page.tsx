@@ -14,9 +14,8 @@ export default async function ProjectsPage() {
   }
 
   const projects = await prisma.project.findMany({
-    orderBy: {
-      projectName: "asc"
-    }
+    where: session.user.projectId ? { id: session.user.projectId } : undefined,
+    orderBy: { projectName: "asc" },
   }).catch(() => []);
 
   return (

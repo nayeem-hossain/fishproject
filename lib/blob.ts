@@ -44,7 +44,7 @@ export async function uploadProjectDocumentFile(params: {
   ].join("/");
 
   const result = await put(blobPath, params.file, {
-    access: "public"
+    access: "private"
   });
 
   return result.url;
@@ -66,6 +66,6 @@ export async function uploadFile(file: File, folder: string) {
   const safeName = sanitizeFileName(file.name || "upload.bin");
   const blobPath = `${folder}/${Date.now()}-${safeName}`;
 
-  const result = await put(blobPath, file, { access: "public" });
+  const result = await put(blobPath, file, { access: "private" });
   return result.url;
 }

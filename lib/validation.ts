@@ -11,13 +11,15 @@ export const projectSchema = z.object({
 export const userSchema = z.object({
   username: z.string().trim().min(3, "Username is required.").max(50, "Username is too long."),
   password: z.string().min(8, "Password must be at least 8 characters."),
-  role: roleSchema
+  role: roleSchema,
+  projectId: z.string().trim().optional().or(z.literal("")).transform(v => v || null),
 });
 
 export const userUpdateSchema = z.object({
   username: z.string().trim().min(3, "Username is required.").max(50, "Username is too long."),
   role: roleSchema,
-  newPassword: z.string().trim().min(6, "Password must be at least 6 characters.").optional().or(z.literal(""))
+  newPassword: z.string().trim().min(6, "Password must be at least 6 characters.").optional().or(z.literal("")),
+  projectId: z.string().trim().optional().or(z.literal("")).transform(v => v || null),
 });
 
 export const documentSchema = z.object({

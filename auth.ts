@@ -51,7 +51,8 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           name: user.username,
           username: user.username,
-          role: user.role as Role
+          role: user.role as Role,
+          projectId: user.projectId ?? null,
         };
       }
     })
@@ -63,8 +64,8 @@ export const authOptions: NextAuthOptions = {
         token.username = user.username;
         token.name = user.username;
         token.role = user.role as Role;
+        token.projectId = user.projectId ?? null;
       }
-
       return token;
     },
     async session({ session, token }) {
@@ -73,8 +74,8 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name ?? token.username ?? session.user.name ?? "";
         session.user.username = token.username ?? token.name ?? session.user.name ?? "";
         session.user.role = token.role;
+        session.user.projectId = token.projectId ?? null;
       }
-
       return session;
     }
   }
