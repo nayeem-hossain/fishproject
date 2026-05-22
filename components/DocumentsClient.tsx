@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { upload } from "@vercel/blob/client";
 import { Modal } from "@/components/Modal";
 import { createDocumentAction, deleteDocumentAction, updateDocumentAction } from "@/app/actions/documents";
 
@@ -77,7 +78,38 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+
+    // Upload each file directly to Blob from the browser, then pass URLs to action
+    const fileFields = [
+      { inputName: "deedFile",            urlName: "deedFileUrl" },
+      { inputName: "guarantorChequeFile", urlName: "guarantorChequeFileUrl" },
+      { inputName: "nidFile",             urlName: "nidFileUrl" },
+      { inputName: "tradeLicenseFile",    urlName: "tradeLicenseFileUrl" },
+    ] as const;
+
+    setError("Uploading files…");
+    try {
+      for (const field of fileFields) {
+        const file = fd.get(field.inputName);
+        if (file instanceof File && file.size > 0) {
+          const blob = await upload(file.name, file, {
+            access: "private",
+            handleUploadUrl: "/api/blob/upload",
+          });
+          fd.set(field.urlName, blob.url);
+        } else {
+          fd.set(field.urlName, "");
+        }
+        fd.delete(field.inputName);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? `Upload failed: ${err.message}` : "File upload failed.");
+      return;
+    }
+
+    setError("");
     startTransition(async () => {
       const result = await createDocumentAction(fd);
       if ("error" in result) { setError(result.error); return; }

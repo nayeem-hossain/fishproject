@@ -6,23 +6,8 @@ import { can } from "@/lib/rbac";
 import { documentSchema, parseFormEntries } from "@/lib/validation";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { uploadProjectDocumentFile } from "@/lib/blob";
 
 type ActionResult = { error: string } | { ok: true };
-
-function getOptionalFile(formData: FormData, fieldName: string): File | null {
-  const file = formData.get(fieldName);
-  if (!(file instanceof File) || file.size <= 0) return null;
-  return file;
-}
-
-async function maybeUpload(
-  file: File | null,
-  params: { projectId: string; subProject: string; label: string }
-): Promise<string> {
-  if (!file) return "";
-  return uploadProjectDocumentFile({ ...params, file });
-}
 
 export async function createDocumentAction(formData: FormData): Promise<ActionResult> {
   const session = await auth();
@@ -37,14 +22,13 @@ export async function createDocumentAction(formData: FormData): Promise<ActionRe
 
   const values = parsed.data;
 
-  try {
-    const [deedFileUrl, guarantorChequeFileUrl, nidFileUrl, tradeLicenseFileUrl] = await Promise.all([
-      maybeUpload(getOptionalFile(formData, "deedFile"),            { projectId, subProject: values.subProject, label: "deed" }),
-      maybeUpload(getOptionalFile(formData, "guarantorChequeFile"), { projectId, subProject: values.subProject, label: "guarantor-cheque" }),
-      maybeUpload(getOptionalFile(formData, "nidFile"),             { projectId, subProject: values.subProject, label: "nid" }),
-      maybeUpload(getOptionalFile(formData, "tradeLicenseFile"),    { projectId, subProject: values.subProject, label: "trade-license" }),
-    ]);
+  // Files are uploaded client-side; action receives the resulting URLs
+  const deedFileUrl            = String(formData.get("deedFileUrl")            ?? "");
+  const guarantorChequeFileUrl = String(formData.get("guarantorChequeFileUrl") ?? "");
+  const nidFileUrl             = String(formData.get("nidFileUrl")             ?? "");
+  const tradeLicenseFileUrl    = String(formData.get("tradeLicenseFileUrl")    ?? "");
 
+  try {
     await prisma.document.create({
       data: {
         projectId,
