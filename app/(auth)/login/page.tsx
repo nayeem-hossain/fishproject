@@ -23,12 +23,20 @@ export default async function LoginPage() {
 
           <div className="mt-10 grid gap-4 text-sm text-slate-300 sm:grid-cols-2">
             <div className="surface-soft p-4">
-              <p className="font-semibold text-white">JWT sessions</p>
-              <p className="mt-2">Credential-based login with role claims in session tokens.</p>
+              <p className="font-semibold text-white">📁 Document Management</p>
+              <p className="mt-2">Store deeds, NID copies, guarantor cheques, and trade licenses linked to each project.</p>
             </div>
             <div className="surface-soft p-4">
-              <p className="font-semibold text-white">Protected routes</p>
-              <p className="mt-2">Middleware and server actions enforce route-level and mutation-level permissions.</p>
+              <p className="font-semibold text-white">🐟 Inventory Tracking</p>
+              <p className="mt-2">Record fish quantity, size, and total weight per pond sub-project with precision.</p>
+            </div>
+            <div className="surface-soft p-4">
+              <p className="font-semibold text-white">🌾 Feed Log Management</p>
+              <p className="mt-2">Track daily feed usage, opening and closing balances across all active ponds.</p>
+            </div>
+            <div className="surface-soft p-4">
+              <p className="font-semibold text-white">👥 Role-Based Access</p>
+              <p className="mt-2">Admins manage all projects. Operators are restricted to their assigned project only.</p>
             </div>
           </div>
         </section>
@@ -36,7 +44,7 @@ export default async function LoginPage() {
         <section className="p-8 sm:p-10 lg:p-12">
           <div className="surface-soft p-6 sm:p-8">
             <h2 className="text-2xl font-semibold text-white">Sign in</h2>
-            <p className="mt-2 text-sm text-slate-400">Use your seeded project account to continue.</p>
+            <p className="mt-2 text-sm text-slate-400">Enter your credentials to access your workspace.</p>
 
             <div className="mt-8">
               <LoginForm />
