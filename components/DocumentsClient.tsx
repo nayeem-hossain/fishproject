@@ -142,9 +142,9 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
 
   function FileLink({ url, label }: { url?: string | null; label: string }) {
     if (!url) return <span className="text-xs text-slate-500">—</span>;
-
+    const href = `/api/blob/download?url=${encodeURIComponent(url)}`;
     return (
-      <a href={url} target="_blank" rel="noreferrer" className="block text-xs text-sky-300 hover:text-sky-200 hover:underline">
+      <a href={href} target="_blank" rel="noreferrer" className="block text-xs text-sky-300 hover:text-sky-200 hover:underline">
         {label}
       </a>
     );
@@ -157,7 +157,7 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
           <h2 className="text-lg font-semibold text-white">Documents ({documents.length})</h2>
           <p className="mt-1 text-sm text-slate-400">Upload and retrieve project records on demand.</p>
         </div>
-        {(role === "ADMIN" || role === "OPERATOR") && (
+        {role === "ADMIN" && (
           <button onClick={() => { setError(""); setShowCreate(true); }} className="button-primary">
             + Add Document
           </button>
@@ -199,7 +199,9 @@ export function DocumentsClient({ projectId, documents, role }: { projectId: str
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-3 text-xs font-medium">
-                        <button onClick={() => { setError(""); setEditDoc(doc); }} className="text-slate-300 hover:text-white hover:underline">Edit</button>
+                        {role === "ADMIN" && (
+                          <button onClick={() => { setError(""); setEditDoc(doc); }} className="text-slate-300 hover:text-white hover:underline">Edit</button>
+                        )}
                         {role === "ADMIN" && (
                           <button onClick={() => handleDelete(doc.id)} className="text-rose-300 hover:text-rose-200 hover:underline">Delete</button>
                         )}
