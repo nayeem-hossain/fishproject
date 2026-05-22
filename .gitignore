@@ -1,0 +1,74 @@
+# Local secrets, credentials, and machine-specific data
+
+# Node / Next.js build output
+node_modules/
+.next/
+.turbo/
+coverage/
+out/
+.vercel/
+*.tsbuildinfo
+
+# AI tooling / local dev config
+.claude/
+.copilot-kit/
+AudioInstructions/
+
+# Environment files
+.env
+.env.*
+!.env.copilot.example
+!.env.example
+
+# Secret-bearing file types
+*.secret
+*.secrets
+*.secret.*
+*.secrets.*
+*.token
+*.tokens
+*.token.*
+*.tokens.*
+*.credential
+*.credentials
+*.credential.*
+*.credentials.*
+*.key
+*.keys
+*.pem
+*.p12
+*.pfx
+*.p8
+*.crt
+*.cer
+*.der
+*.p7b
+*.p7c
+*.jks
+*.keystore
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# Cloud / tooling credentials
+.npmrc
+.netrc
+.pypirc
+.git-credentials
+.aws/credentials
+.aws/config
+.kube/config
+.gcloud/
+
+# Common secret fixtures and exports
+service-account*.json
+client_secret*.json
+*.tfstate
+*.tfstate.*
+*.log
+*.trace
+*.dmp
+*.dump
+*.sqlite
+*.sqlite3
